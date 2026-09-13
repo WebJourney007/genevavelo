@@ -13,6 +13,7 @@
 
 | id | titre | prio | temps | effort | deps | note |
 | -- | ----- | ---- | ----- | ------ | ---- | ---- |
+| B-001 | Publier l'article « Apprendre à circuler à vélo » (page statique FR + bloc home) | 🟡 | 2h | moyen | — | Source `resources/Cours_de_velo_UNIGE_inclusif.docx` · FR seul · spec `todo/specs/spec-B-001.md` |
 
 <!-- Statuts : [ ] à faire · [x] fait · [-] abandonné · [?] idée non qualifiée.
      Nouvel item → en haut. Item livré → migré dans « Archive » ci-dessous. -->

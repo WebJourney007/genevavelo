@@ -429,7 +429,6 @@ a {
 }
 
 .hero__wrapper {
-  background-color: var(--white);
   width: 100%;
   height: 100%;
 }
@@ -670,10 +669,6 @@ a {
   text-align: center;
 }
 
-.icon {
-  color: var(--blue-dark);
-}
-
 .card--img {
   width: 25px;
 }
@@ -683,12 +678,29 @@ a {
   width: 50%;
 }
 
+/* Colonne gauche calée sur le titre (2 lignes forcées), la droite prend le reste */
+.propos__col {
+  flex: 1 1 0;
+}
+
+.propos__col:first-child {
+  flex: 0 0 auto;
+}
+
+.propos__col h2 {
+  white-space: nowrap;
+}
+
 ._50.center {
   text-align: center;
 }
 
 .section--more {
   margin-top: var(--_spacing---0);
+}
+
+.section----propos .container {
+  padding-top: 0;
 }
 
 .section--particuliers {
@@ -704,44 +716,49 @@ a {
 }
 
 .card__wrapper {
-  grid-column-gap: var(--_spacing---30);
-  grid-row-gap: var(--_spacing---30);
   border: 1px solid var(--blue-light);
   background-color: var(--white);
   border-radius: 8px;
   flex-flow: row;
-  align-self: stretch;
-  flex: 0 auto;
-  justify-content: flex-start;
-  align-items: flex-start;
+  align-items: stretch;
   width: 100%;
-  height: auto;
-  padding: .9375em;
+  height: 100%;
   display: flex;
+  overflow: hidden;
 }
 
+/* Image pleine hauteur de la card, bord à bord.
+   contain: size ignore la taille intrinsèque : c'est le texte qui fixe la hauteur */
 .image-4 {
-  border-radius: var(--_spacing---7-5);
+  contain: size;
   object-fit: cover;
-  object-position: 50% 13%;
-  background-image: linear-gradient(#5396d1, #5396d1);
-  flex: none;
-  width: 50%;
-  height: 200px;
-  overflow: hidden;
+  object-position: 50% 30%;
+  flex: 0 0 40%;
+  width: 40%;
+  /* auto : neutralise l'attribut height="3024" du HTML */
+  height: auto;
+  min-height: 220px;
+  display: block;
+}
+
+/* Logo : jamais rogné, fond aligné sur celui du SVG */
+.image-4.is--contain {
+  object-fit: contain;
+  background-color: #009ddc;
+}
+
+.card__wrapper .div-block-5 {
+  padding: var(--_spacing---30);
 }
 
 .card-line {
   grid-column-gap: 2em;
   grid-row-gap: 2em;
-  flex-flow: wrap;
-  grid-template-rows: auto auto;
   grid-template-columns: 1fr 1fr;
-  grid-auto-columns: 1fr;
-  justify-content: center;
-  align-items: center;
+  /* Toutes les rangées prennent la hauteur de la card la plus haute */
+  grid-auto-rows: 1fr;
+  align-items: stretch;
   width: 100%;
-  height: 100%;
   display: grid;
 }
 
@@ -813,6 +830,8 @@ a {
 .slide-nav__dot {
   width: 8px;
   height: 8px;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
   background: var(--blue-light);
   cursor: pointer;
@@ -969,6 +988,16 @@ a {
 @media screen and (max-width: 991px) {
   body {
     font-size: 10px;
+  }
+
+  /* Empile titre puis texte, neutralise le row-reverse de .flexbox en mobile */
+  .flexbox.propos__content {
+    flex-flow: column;
+    gap: var(--_spacing---30);
+  }
+
+  .propos__col h2 {
+    white-space: normal;
   }
 
   .hero__title {
@@ -1149,27 +1178,27 @@ a {
     margin-left: 20px;
   }
 
-  .icon {
-    object-fit: scale-down;
-  }
-
   ._50,
   ._50.center {
     width: 80%;
   }
 
   .card__wrapper {
-    height: auto;
-    max-height: 40vh;
+    flex-flow: column;
+  }
+
+  .image-4 {
+    contain: none;
+    flex: none;
+    width: 100%;
+    min-height: 0;
+    aspect-ratio: 16 / 10;
   }
 
   .card-line {
-    grid-column-gap: var(--_spacing---15);
-    grid-row-gap: var(--_spacing---15);
-    flex-flow: column;
-    justify-content: flex-start;
-    align-items: stretch;
-    display: flex;
+    grid-column-gap: var(--_spacing---30);
+    grid-row-gap: var(--_spacing---30);
+    grid-template-columns: 1fr;
   }
 
   .cours--content {
@@ -1191,14 +1220,6 @@ a {
     grid-column-gap: var(--_spacing---15);
     grid-row-gap: var(--_spacing---15);
     flex-flow: row;
-  }
-
-  .right-arrow {
-    display: none;
-  }
-
-  .left-arrow {
-    display: none;
   }
 }
 
@@ -1431,17 +1452,6 @@ a {
     margin-top: 20px;
   }
 
-  .icon {
-    margin-left: 0;
-    margin-right: 0;
-    display: none;
-  }
-
-  .icon.right {
-    margin-left: auto;
-    display: none;
-  }
-
   ._50 {
     width: 100%;
   }
@@ -1463,21 +1473,6 @@ a {
     display: block;
   }
 
-  .card__wrapper {
-    flex-flow: column;
-    max-height: none;
-  }
-
-  .image-4 {
-    width: 100%;
-  }
-
-  .card-line {
-    grid-column-gap: var(--_spacing---60);
-    grid-row-gap: var(--_spacing---60);
-    justify-content: center;
-    align-items: center;
-  }
 
   .center {
     text-align: left;
@@ -1498,11 +1493,6 @@ a {
   .flexbox-copy-copy.vertical.center.gap--30 {
     justify-content: center;
     align-items: flex-start;
-  }
-
-  .right-arrow,
-  .left-arrow {
-    display: none;
   }
 }
 

@@ -69,8 +69,10 @@ function initSlider() {
   let dragStartX = null;
 
   const dots = [...slides].map((_, i) => {
-    const dot = document.createElement('div');
+    const dot = document.createElement('button');
+    dot.type = 'button';
     dot.className = 'slide-nav__dot';
+    dot.setAttribute('aria-label', `${i + 1} / ${slides.length}`);
     dot.addEventListener('click', () => goTo(i));
     dotsWrapper.appendChild(dot);
     return dot;
@@ -79,9 +81,11 @@ function initSlider() {
   function goTo(index) {
     slides[current].classList.remove('is-active');
     dots[current].classList.remove('is-active');
+    dots[current].removeAttribute('aria-current');
     current = (index + slides.length) % slides.length;
     slides[current].classList.add('is-active');
     dots[current].classList.add('is-active');
+    dots[current].setAttribute('aria-current', 'true');
     clearInterval(autoplayTimer);
     autoplayTimer = setInterval(() => goTo(current + 1), 7500);
   }
@@ -97,8 +101,6 @@ function initSlider() {
   slider.addEventListener('touchstart', (e) => { dragStartX = e.touches[0].clientX; }, { passive: true });
   slider.addEventListener('touchend', (e) => endDrag(e.changedTouches[0].clientX));
   slider.addEventListener('dragstart', (e) => e.preventDefault());
-  slider.querySelector('.left-arrow').addEventListener('click', () => goTo(current - 1));
-  slider.querySelector('.right-arrow').addEventListener('click', () => goTo(current + 1));
 
   goTo(0);
 }

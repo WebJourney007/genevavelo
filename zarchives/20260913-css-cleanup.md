@@ -1,7 +1,7 @@
 # Nettoyage CSS / JS — un seul style.css, un seul main.js
 
 | Ouverture | 2026-09-13 | 18:47 |
-| Clôture | | |
+| Clôture | 2026-09-13 | 19:33 |
 
 ## Progression
 

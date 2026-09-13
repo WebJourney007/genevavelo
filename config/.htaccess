@@ -1,0 +1,10 @@
+# Empêcher l'accès direct au dossier config
+Order Deny,Allow
+Deny from all
+
+# Autoriser uniquement les scripts PHP du serveur
+<FilesMatch "\.php$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+

@@ -1,0 +1,22 @@
+<?php
+/**
+ * Configuration envoi de formulaire (PHPMailer)
+ * Copiez ce fichier en smtp.php et remplissez vos identifiants.
+ * Le fichier smtp.php ne doit pas être commité (.gitignore).
+ */
+
+return [
+    // SMTP
+    'host'     => 'mail.infomaniak.com',
+    'username' => 'votre@email.ch',
+    'password' => 'VOTRE_MOT_DE_PASSE',
+    'port'     => 465,       // 465 = SSL, 587 = TLS
+    'secure'   => 'ssl',     // 'ssl' ou 'tls'
+
+    // Envoi / réception
+    'from_email' => 'noreply@votredomaine.ch',
+    'from_name'  => 'BikeFit Valais',
+    'to_email'   => 'info@bikefitvalais.ch',
+    'to_name'    => 'BikeFit Valais',
+];
+

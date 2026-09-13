@@ -1,0 +1,13 @@
+User-agent: *
+Disallow: /*?*
+
+# Allow important static assets and language subdirectory
+Allow: /css/
+Allow: /images/
+Allow: /js/
+Allow: /en/
+Allow: /favicon.ico
+Allow: /webclip.png
+
+# Sitemap (optionnel - à ajouter plus tard si nécessaire)
+# Sitemap: https://www.genevavelo.ch/sitemap.xml 

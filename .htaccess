@@ -13,16 +13,8 @@ RewriteCond %{QUERY_STRING} . [NC]
 RewriteCond %{REQUEST_URI} ^/$ [NC]
 RewriteRule ^$ /? [R=301,L]
 
-# Bloquer l'accès aux fichiers sensibles
-<Files ".htaccess">
-    Order allow,deny
-    Deny from all
-</Files>
-
-<Files "robots.txt">
-    Order allow,deny
-    Allow from all
-</Files>
+# Bloquer l'accès aux fichiers et dossiers cachés (.env, .git, .claude…), sauf .well-known
+RedirectMatch 404 "/\.(?!well-known/)"
 
 Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
 

@@ -1,6 +1,11 @@
 <?php
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['success' => false]);
+    exit;
+}
 
 // ── Chargement du fichier .env ────────────────────────────────────
 $envFile = __DIR__ . '/.env';
@@ -26,11 +31,41 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
+// Sujets autorisés = options du <select> FR et EN
+const ALLOWED_SUBJECTS = [
+    'Cours particulier', 'Formation entreprise', 'Événement', 'Demande de devis', 'Autre',
+    'Private lesson', 'Corporate training', 'Event', 'Request a quote', 'Other',
+];
+const RATE_LIMIT_MAX    = 5;    // envois max par IP…
+const RATE_LIMIT_WINDOW = 3600; // …sur cette fenêtre glissante (secondes)
+
+// Enregistre la tentative et indique si l'IP a dépassé son quota
+function rateLimitExceeded(string $ip): bool {
+    $fp = fopen(__DIR__ . '/config/form_rate_limit.json', 'c+');
+    if (!$fp) return false; // stockage indisponible : on ne bloque pas l'envoi
+    flock($fp, LOCK_EX);
+    $data = json_decode(stream_get_contents($fp), true) ?: [];
+    $now  = time();
+    foreach ($data as $key => $times) {
+        $data[$key] = array_values(array_filter($times, fn($t) => $now - $t < RATE_LIMIT_WINDOW));
+        if (!$data[$key]) unset($data[$key]);
+    }
+    $exceeded = count($data[$ip] ?? []) >= RATE_LIMIT_MAX;
+    if (!$exceeded) $data[$ip][] = $now;
+    ftruncate($fp, 0);
+    rewind($fp);
+    fwrite($fp, json_encode($data, JSON_PRETTY_PRINT));
+    flock($fp, LOCK_UN);
+    fclose($fp);
+    return $exceeded;
+}
+
 // ── Protection anti-spam (honeypot + timing) ─────────────────────
 $honeypot  = $_POST['website']   ?? '';
 $form_time = intval($_POST['form_time'] ?? 0);
 
-if (!empty($honeypot) || ($form_time > 0 && (time() - $form_time) < 3)) {
+// form_time absent = soumission hors du site → traité comme un bot
+if ($honeypot !== '' || $form_time <= 0 || (time() - $form_time) < 3) {
     echo json_encode(['success' => true]); // réponse silencieuse
     exit;
 }
@@ -50,6 +85,17 @@ if (!$name || !$email || !$subject || !$message) {
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     echo json_encode(['success' => false, 'error' => 'Adresse e-mail invalide.']);
+    exit;
+}
+
+if (!in_array($subject, ALLOWED_SUBJECTS, true)) {
+    echo json_encode(['success' => false, 'error' => 'Sujet invalide.']);
+    exit;
+}
+
+if (rateLimitExceeded($_SERVER['REMOTE_ADDR'] ?? '')) {
+    http_response_code(429);
+    echo json_encode(['success' => false, 'error' => 'Trop de messages envoyés, réessayez plus tard.']);
     exit;
 }
 // ─────────────────────────────────────────────────────────────────
@@ -74,7 +120,7 @@ try {
 
     // Contenu
     $prefix        = env('MAIL_SUBJECT_PREFIX', '[Genevavelo]');
-    $mail->Subject = $prefix . ' ' . htmlspecialchars($subject);
+    $mail->Subject = $prefix . ' ' . $subject; // texte brut, sujet déjà whitelisté
 
     $nameSafe    = htmlspecialchars($name);
     $emailSafe   = htmlspecialchars($email);
@@ -170,5 +216,7 @@ HTML;
     echo json_encode(['success' => true]);
 
 } catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => $mail->ErrorInfo]);
+    // Détail technique dans les logs serveur uniquement
+    error_log('send-mail.php : ' . $mail->ErrorInfo);
+    echo json_encode(['success' => false, 'error' => "Échec de l'envoi."]);
 }

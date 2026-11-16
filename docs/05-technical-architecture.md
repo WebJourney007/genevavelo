@@ -14,7 +14,8 @@
 
 - Site statique HTML / CSS / JS vanilla, sans framework ni étape de build (issu d'un export Webflow nettoyé).
 - Formulaire de contact : `send-mail.php` + PHPMailer embarqué (`config/PHPMailer-master/`), envoi via `mail()` (relai OVH), configuration dans `.env`.
-- Hébergement : Apache sur OVH (`.htaccess` : HTTPS, cache, blocage des fichiers cachés).
+- Hébergement : Apache sur OVH (`.htaccess` : HTTPS, cache, blocage des fichiers cachés, en-têtes de sécurité).
+- En-têtes de sécurité (`.htaccess`) : HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy. La CSP liste chaque origine externe (Google Fonts, `img.icons8.com`) : toute nouvelle ressource externe ou script inline doit y être ajoutée, sinon le navigateur la bloque. Le handler `onload` du chargement Google Fonts est autorisé par son hash — le modifier impose de recalculer le hash.
 
 ## Organisation du code
 
